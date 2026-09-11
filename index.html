@@ -3,34 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harita Uygulaması</title>
-    <!-- Leaflet Harita Kütüphanesi CSS -->
+    <title>Yol Tarifi Navigasyon Uygulaması</title>
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet Routing Machine CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <style>
-        body { margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
         #map { width: 100vw; height: 100vh; }
+        .info-box {
+            position: absolute; top: 10px; right: 10px; z-index: 1000;
+            background: white; padding: 10px 15px; border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 14px;
+        }
     </style>
 </head>
 <body>
+    <div class="info-box">Harita üzerinde **iki farklı noktaya** dokunarak rota oluşturun.</div>
     <div id="map"></div>
 
-    <!-- Leaflet Harita Kütüphanesi JS -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine JS -->
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     <script>
         // Haritayı İstanbul merkezli başlatıyoruz
         var map = L.map('map').setView([41.0082, 28.9784], 13);
 
-        // Harita görsel katmanı
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // Haritada herhangi bir yere tıkladığında pin ekleme
+        // Yol tarifi eklentisi
+        var control = L.Routing.control({
+            waypoints: [],
+            routeWhileDragging: true,
+            language: 'tr',
+            serviceUrl: 'https://router.project-osrm.org/route/v1'
+        }).addTo(map);
+
+        // Haritaya tıklandıkça başlangıç ve bitiş noktalarını belirleme
         map.on('click', function(e) {
-            L.marker([e.latlng.lat, e.latlng.lng]).addTo(map)
-                .bindPopup("Seçilen Konum: " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4))
-                .openPopup();
+            var waypoints = control.getWaypoints();
+            
+            if (waypoints.length >= 2 && waypoints[0].latLng && waypoints[1].latLng) {
+                // Eğer iki nokta seçiliyse sıfırla ve yeniden başlat
+                control.setWaypoints([e.latlng]);
+            } else if (waypoints.length === 1 && waypoints[0].latLng) {
+                // İkinci noktayı ekle ve rotayı hesapla
+                control.setWaypoints([waypoints[0].latLng, e.latlng]);
+            } else {
+                // İlk noktayı belirle
+                control.setWaypoints([e.latlng]);
+            }
         });
     </script>
 </body>
