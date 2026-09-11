@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harita Uygulaması</title>
+    <!-- Leaflet Harita Kütüphanesi CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Leaflet Harita Kütüphanesi JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Haritayı İstanbul merkezli başlatıyoruz
+        var map = L.map('map').setView([41.0082, 28.9784], 13);
+
+        // Harita görsel katmanı
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Haritada herhangi bir yere tıkladığında pin ekleme
+        map.on('click', function(e) {
+            L.marker([e.latlng.lat, e.latlng.lng]).addTo(map)
+                .bindPopup("Seçilen Konum: " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4))
+                .openPopup();
+        });
+    </script>
+</body>
+</html>
