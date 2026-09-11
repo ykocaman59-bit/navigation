@@ -1,0 +1,26 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları İndir
+        uses: actions/checkout@v3
+
+      - name: Java Kurulumu
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Android Ortamını Hazırla ve Projeyi Derle
+        run: |
+          mkdir -p android-app/app/src/main/assets
+          cp index.html android-app/app/src/main/assets/index.html
+          # Basit bir WebView wrapper veya build adımları buraya eklenebilir
+          echo "APK derleme betiği çalıştırıldı."
+
